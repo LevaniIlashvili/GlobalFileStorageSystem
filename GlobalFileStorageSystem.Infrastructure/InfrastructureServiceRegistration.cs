@@ -1,4 +1,6 @@
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
 using GlobalFileStorageSystem.Infrastructure.Persistance;
+using GlobalFileStorageSystem.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +16,7 @@ namespace GlobalFileStorageSystem.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("PostgreSqlConnection")));
 
+            services.AddScoped<ITenantRepository, TenantRepository>();
 
             return services;
         }

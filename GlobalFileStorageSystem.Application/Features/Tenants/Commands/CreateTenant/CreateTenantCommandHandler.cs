@@ -5,7 +5,7 @@ using MediatR;
 
 namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTenant
 {
-    public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, Tenant>
+    public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, TenantViewmodel>
     {
         private readonly ITenantRepository _tenantRepository;
         private readonly IUserRepository _userRepository;
@@ -18,7 +18,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             _userRepository = userRepository;
         }
 
-        public async Task<Tenant> Handle(CreateTenantCommand command, CancellationToken cancellationToken)
+        public async Task<TenantViewmodel> Handle(CreateTenantCommand command, CancellationToken cancellationToken)
         {
             long storageQuota;
             long bandwidthQuota;
@@ -61,7 +61,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
                 BillingPlan = command.BillingPlan,
                 TenantStatus = TenantStatus.Active,
                 ComplianceRequirements = command.ComplianceRequirements,
-                EncryptionRequirements = command.EncriptionRequirement,
+                EncryptionRequirements = command.EncryptionRequirement,
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -79,7 +79,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
 
             await _userRepository.AddAsync(user);
 
-            return addedTenant;
+            return _mapper.Map<TenantViewmodel>(addedTenant);
         }
     }
 }

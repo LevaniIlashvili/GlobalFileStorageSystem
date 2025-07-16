@@ -12,17 +12,23 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
         private readonly ITenantRepository _tenantRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMinioService _minioService;
+        private readonly IEmailService _emailService;
+        private readonly IPasswordGenerator _passwordGenerator;
         private readonly IMapper _mapper;
 
         public CreateTenantCommandHandler(
             ITenantRepository tenantRepository,
             IUserRepository userRepository,
             IMinioService minioService,
+            IEmailService emailService,
+            IPasswordGenerator passwordGenerator,
             IMapper mapper)
         {
             _tenantRepository = tenantRepository;
             _userRepository = userRepository;
             _minioService = minioService;
+            _emailService = emailService;
+            _passwordGenerator = passwordGenerator;
             _mapper = mapper;
         }
 
@@ -86,6 +92,18 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             };
 
             await _userRepository.AddAsync(user);
+
+            await _emailService.SendAsync(
+                command.AdminEmail,
+                "Welcome to Global File Storage",
+                $@"
+                    <h2>Temporary Credentials</h2>
+                    <p>Hello, your tenant has been created successfully.</p>
+                    <p><b>Tenant:</b> {addedTenant.OrganizationName}</p>
+                    <p><b>Admin Email:</b> {command.AdminEmail}</p>
+                    <p><b>Temporary Password: ${_passwordGenerator.Generate()}</p>
+                    <p><i>Note: Update your password upon first login.</i></p>"
+            );
 
             await _minioService.CreateTenantBucketAsync(addedTenant.Id.ToString());
 

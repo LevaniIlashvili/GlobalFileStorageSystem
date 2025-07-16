@@ -17,6 +17,7 @@ namespace GlobalFileStorageSystem.Infrastructure
                 options.UseNpgsql(configuration.GetConnectionString("PostgreSqlConnection")));
 
             services.AddScoped<ITenantRepository, TenantRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

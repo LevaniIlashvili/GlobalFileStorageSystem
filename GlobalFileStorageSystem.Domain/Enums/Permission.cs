@@ -12,6 +12,15 @@
         MetadataEdit = 1 << 5, // 32
         UserManage = 1 << 6, // 64
         BillingView = 1 << 7, // 128
-        AuditView = 1 << 8  // 256
+        AuditView = 1 << 8,  // 256
+        All = FileRead
+          | FileWrite
+          | FileDelete
+          | FolderCreate
+          | ShareCreate
+          | MetadataEdit
+          | UserManage
+          | BillingView
+          | AuditView
     }
 }

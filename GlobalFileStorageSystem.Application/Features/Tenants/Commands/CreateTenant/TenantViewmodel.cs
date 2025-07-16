@@ -4,6 +4,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
 {
     public class TenantViewmodel
     {
+        public Guid Id { get; set; }
         public string OrganizationName { get; set; }
         public string SubdomainPrefix { get; set; }
         public TenantStatus TenantStatus { get; set; }

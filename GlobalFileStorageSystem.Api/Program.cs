@@ -1,3 +1,4 @@
+using GlobalFileStorageSystem.Api.Middlewares;
 using GlobalFileStorageSystem.Application;
 using GlobalFileStorageSystem.Infrastructure;
 
@@ -20,6 +21,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCustomExceptionHandler();
 
 app.UseHttpsRedirection();
 

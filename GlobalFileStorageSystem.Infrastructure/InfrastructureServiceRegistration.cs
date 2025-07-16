@@ -35,6 +35,12 @@ namespace GlobalFileStorageSystem.Infrastructure
 
             services.AddSingleton<IMinioService, MinioService>();
 
+            services.Configure<SmtpOptions>(configuration.GetSection("SmtpSettings"));
+
+            services.AddScoped<IEmailService, EmailService>();
+
+            services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
+
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 

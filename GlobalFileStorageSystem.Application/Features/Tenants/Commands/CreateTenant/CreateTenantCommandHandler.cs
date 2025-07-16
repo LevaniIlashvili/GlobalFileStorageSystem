@@ -1,4 +1,6 @@
-﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
+﻿using AutoMapper;
+using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Domain.Entities;
 using GlobalFileStorageSystem.Domain.Enums;
 using MediatR;
@@ -9,13 +11,19 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
     {
         private readonly ITenantRepository _tenantRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMinioService _minioService;
+        private readonly IMapper _mapper;
 
         public CreateTenantCommandHandler(
-            ITenantRepository tennantRepository,
-            IUserRepository userRepository)
+            ITenantRepository tenantRepository,
+            IUserRepository userRepository,
+            IMinioService minioService,
+            IMapper mapper)
         {
-            _tenantRepository = tennantRepository;
+            _tenantRepository = tenantRepository;
             _userRepository = userRepository;
+            _minioService = minioService;
+            _mapper = mapper;
         }
 
         public async Task<TenantViewmodel> Handle(CreateTenantCommand command, CancellationToken cancellationToken)
@@ -78,6 +86,8 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             };
 
             await _userRepository.AddAsync(user);
+
+            await _minioService.CreateTenantBucketAsync(addedTenant.Id.ToString());
 
             return _mapper.Map<TenantViewmodel>(addedTenant);
         }

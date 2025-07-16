@@ -1,4 +1,4 @@
-﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Infrastructure.Persistance;
 using GlobalFileStorageSystem.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿namespace GlobalFileStorageSystem.Application.Contracts.Infrastructure
+﻿namespace GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories
 {
     public interface IAsyncRepository<T> where T : class
     {

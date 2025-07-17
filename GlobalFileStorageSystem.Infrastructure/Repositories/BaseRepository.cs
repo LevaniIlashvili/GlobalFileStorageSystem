@@ -1,4 +1,4 @@
-﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,33 +12,30 @@ namespace GlobalFileStorageSystem.Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
-        public virtual async Task<T?> GetByIdAsync(Guid id)
+
+        public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Set<T>().FindAsync(id);
-        }
-        public async Task<IReadOnlyList<T>> ListAllAsync()
-        {
-            return await _dbContext.Set<T>().ToListAsync();
+            return await _dbContext.Set<T>().FindAsync([id], cancellationToken);
         }
 
-        public async Task<T> AddAsync(T entity)
+        public IQueryable<T> ListAll()
+        {
+            return _dbContext.Set<T>().AsQueryable();
+        }
+
+        public async Task AddAsync(T entity)
         {
             await _dbContext.Set<T>().AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
-
-            return entity;
         }
-        public async Task UpdateAsync(T entity)
+
+        public void Update(T entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(T entity)
+        public void Delete(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
-            await _dbContext.SaveChangesAsync();
         }
-
     }
 }

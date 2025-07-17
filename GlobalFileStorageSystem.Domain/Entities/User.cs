@@ -7,6 +7,7 @@ namespace GlobalFileStorageSystem.Domain.Entities
         public Guid TenantId { get; set; }
 
         public string Email { get; set; }
+        public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
         public Permission Permissions { get; set; }
 

@@ -62,6 +62,10 @@ namespace GlobalFileStorageSystem.Api.Middlewares
                     httpStatusCode = HttpStatusCode.Conflict;
                     break;
 
+                case UnauthorizedException:
+                    httpStatusCode = HttpStatusCode.Unauthorized;
+                    break;
+
                 default:
                     _logger.LogError(exception, "An unexpected error occurred.");
                     result = JsonSerializer.Serialize(new { error = "An unexpected error occurred. Please try again later." });

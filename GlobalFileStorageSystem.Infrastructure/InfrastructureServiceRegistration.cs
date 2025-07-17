@@ -45,6 +45,8 @@ namespace GlobalFileStorageSystem.Infrastructure
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
             services.AddSingleton<IJwtService, JwtService>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 

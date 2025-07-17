@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
 using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Domain.Entities;
 using GlobalFileStorageSystem.Domain.Enums;
@@ -15,7 +14,6 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
         private readonly IEmailService _emailService;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
         public CreateTenantCommandHandler(
@@ -24,7 +22,6 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             IMinioService minioService,
             IEmailService emailService,
             IPasswordGenerator passwordGenerator,
-            IMapper mapper,
             IUnitOfWork unitOfWork,
             IPasswordHasher passwordHasher)
         {
@@ -33,7 +30,6 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             _minioService = minioService;
             _emailService = emailService;
             _passwordGenerator = passwordGenerator;
-            _mapper = mapper;
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
         }
@@ -115,7 +111,20 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
 
             await _minioService.CreateTenantBucketAsync(tenant.Id.ToString());
 
-            return _mapper.Map<TenantViewmodel>(tenant);
+            return new TenantViewmodel()
+            {
+                Id = tenant.Id,
+                OrganizationName = tenant.OrganizationName,
+                SubdomainPrefix = tenant.SubdomainPrefix,
+                TenantStatus = tenant.TenantStatus,
+                StorageQuota = tenant.StorageQuota,
+                BandwithQuota = tenant.BandwithQuota,
+                APIRateLimit = tenant.APIRateLimit,
+                BillingPlan = tenant.BillingPlan,
+                ComplianceRequirements = tenant.ComplianceRequirements,
+                DataResidencyRegion = tenant.DataResidencyRegion,
+                EncryptionRequirements = tenant.EncryptionRequirements
+            };
         }
     }
 }

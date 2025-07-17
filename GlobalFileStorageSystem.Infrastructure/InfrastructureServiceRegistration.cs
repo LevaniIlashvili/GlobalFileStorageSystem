@@ -43,6 +43,8 @@ namespace GlobalFileStorageSystem.Infrastructure
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+            services.AddSingleton<IJwtService, JwtService>();
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 

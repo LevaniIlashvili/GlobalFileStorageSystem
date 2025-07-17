@@ -16,6 +16,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         public CreateTenantCommandHandler(
             ITenantRepository tenantRepository,
@@ -23,8 +24,8 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             IMinioService minioService,
             IEmailService emailService,
             IPasswordGenerator passwordGenerator,
-            IMapper mapper)
             IMapper mapper,
+            IUnitOfWork unitOfWork,
             IPasswordHasher passwordHasher)
         {
             _tenantRepository = tenantRepository;
@@ -33,6 +34,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             _emailService = emailService;
             _passwordGenerator = passwordGenerator;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
         }
 
@@ -66,8 +68,6 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
                     throw new ArgumentOutOfRangeException(nameof(command.BillingPlan), "Unknown billing plan");
             }
 
-
-
             var tenant = new Tenant()
             {
                 OrganizationName = command.OrganizationName,
@@ -83,12 +83,12 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
                 CreatedAt = DateTime.UtcNow,
             };
 
-            var addedTenant = await _tenantRepository.AddAsync(tenant);
+            await _tenantRepository.AddAsync(tenant);
 
             var generatedPassword = _passwordGenerator.Generate();
             var user = new User()
             {
-                TenantId = addedTenant.Id,
+                TenantId = tenant.Id,
                 MFAEnabled = true,
                 Role = UserRole.TenantAdmin,
                 Permissions = Permission.All,
@@ -99,21 +99,23 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
 
             await _userRepository.AddAsync(user);
 
+            await _unitOfWork.SaveChangesAsync();
+
             await _emailService.SendAsync(
                 command.AdminEmail,
                 "Welcome to Global File Storage",
                 $@"
                     <h2>Temporary Credentials</h2>
                     <p>Hello, your tenant has been created successfully.</p>
-                    <p><b>Tenant:</b> {addedTenant.OrganizationName}</p>
+                    <p><b>Tenant:</b> {tenant.OrganizationName}</p>
                     <p><b>Admin Email:</b> {command.AdminEmail}</p>
                     <p><b>Temporary Password: {generatedPassword}</p>
                     <p><i>Note: Update your password upon first login.</i></p>"
             );
 
-            await _minioService.CreateTenantBucketAsync(addedTenant.Id.ToString());
+            await _minioService.CreateTenantBucketAsync(tenant.Id.ToString());
 
-            return _mapper.Map<TenantViewmodel>(addedTenant);
+            return _mapper.Map<TenantViewmodel>(tenant);
         }
     }
 }

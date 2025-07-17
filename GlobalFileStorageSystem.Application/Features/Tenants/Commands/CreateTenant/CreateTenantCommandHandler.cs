@@ -14,6 +14,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
         private readonly IMinioService _minioService;
         private readonly IEmailService _emailService;
         private readonly IPasswordGenerator _passwordGenerator;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
 
         public CreateTenantCommandHandler(
@@ -23,6 +24,8 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             IEmailService emailService,
             IPasswordGenerator passwordGenerator,
             IMapper mapper)
+            IMapper mapper,
+            IPasswordHasher passwordHasher)
         {
             _tenantRepository = tenantRepository;
             _userRepository = userRepository;
@@ -30,6 +33,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             _emailService = emailService;
             _passwordGenerator = passwordGenerator;
             _mapper = mapper;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<TenantViewmodel> Handle(CreateTenantCommand command, CancellationToken cancellationToken)
@@ -81,6 +85,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
 
             var addedTenant = await _tenantRepository.AddAsync(tenant);
 
+            var generatedPassword = _passwordGenerator.Generate();
             var user = new User()
             {
                 TenantId = addedTenant.Id,
@@ -88,7 +93,8 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
                 Role = UserRole.TenantAdmin,
                 Permissions = Permission.All,
                 Email = command.AdminEmail,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                PasswordHash = _passwordHasher.HashPassword(generatedPassword)
             };
 
             await _userRepository.AddAsync(user);
@@ -101,7 +107,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
                     <p>Hello, your tenant has been created successfully.</p>
                     <p><b>Tenant:</b> {addedTenant.OrganizationName}</p>
                     <p><b>Admin Email:</b> {command.AdminEmail}</p>
-                    <p><b>Temporary Password: ${_passwordGenerator.Generate()}</p>
+                    <p><b>Temporary Password: {generatedPassword}</p>
                     <p><i>Note: Update your password upon first login.</i></p>"
             );
 

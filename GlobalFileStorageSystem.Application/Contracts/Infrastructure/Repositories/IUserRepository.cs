@@ -4,5 +4,6 @@ namespace GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositor
 {
     public interface IUserRepository : IAsyncRepository<User>
     {
+        Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     }
 }

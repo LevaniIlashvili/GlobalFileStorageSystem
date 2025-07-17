@@ -41,6 +41,8 @@ namespace GlobalFileStorageSystem.Infrastructure
 
             services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
 
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 

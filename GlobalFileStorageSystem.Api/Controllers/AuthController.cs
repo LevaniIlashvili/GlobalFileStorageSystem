@@ -1,4 +1,5 @@
-﻿using GlobalFileStorageSystem.Application.Features.Auth.Queries;
+﻿using GlobalFileStorageSystem.Application.Features.Auth.Queries.LoginUser;
+using GlobalFileStorageSystem.Application.Features.Auth.Queries.RefreshToken;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,13 @@ namespace GlobalFileStorageSystem.Api.Controllers
         {
             var accessToken = await _mediator.Send(query);
             return Ok(accessToken);
-        } 
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(RefreshTokenQuery command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }

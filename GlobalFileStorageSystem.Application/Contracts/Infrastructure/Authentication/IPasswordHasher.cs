@@ -1,6 +1,6 @@
 ﻿using GlobalFileStorageSystem.Domain.Entities;
 
-namespace GlobalFileStorageSystem.Application.Contracts.Infrastructure
+namespace GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication
 {
     public interface IPasswordHasher
     {

@@ -1,14 +1,17 @@
 ﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication;
 using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Infrastructure.Options;
 using GlobalFileStorageSystem.Infrastructure.Persistance;
 using GlobalFileStorageSystem.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Infrastructure.Services;
+using GlobalFileStorageSystem.Infrastructure.Services.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Minio;
+using StackExchange.Redis;
 
 namespace GlobalFileStorageSystem.Infrastructure
 {
@@ -35,6 +38,11 @@ namespace GlobalFileStorageSystem.Infrastructure
 
             services.AddSingleton<IMinioService, MinioService>();
 
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                return ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
+            });
+
             services.Configure<SmtpOptions>(configuration.GetSection("SmtpSettings"));
 
             services.AddScoped<IEmailService, EmailService>();
@@ -44,7 +52,9 @@ namespace GlobalFileStorageSystem.Infrastructure
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-            services.AddSingleton<IJwtService, JwtService>();
+            services.AddScoped<IJwtService, JwtService>();
+
+            services.AddScoped<IRefreshTokenService, RedisRefreshTokenService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITenantRepository, TenantRepository>();

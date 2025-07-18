@@ -1,4 +1,4 @@
-﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication;
 using GlobalFileStorageSystem.Domain.Entities;
 using GlobalFileStorageSystem.Infrastructure.Options;
 using Microsoft.Extensions.Options;

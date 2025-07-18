@@ -1,6 +1,6 @@
-﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication;
 
-namespace GlobalFileStorageSystem.Infrastructure.Services
+namespace GlobalFileStorageSystem.Infrastructure.Services.Authentication
 {
     public class PasswordHasher : IPasswordHasher
     {

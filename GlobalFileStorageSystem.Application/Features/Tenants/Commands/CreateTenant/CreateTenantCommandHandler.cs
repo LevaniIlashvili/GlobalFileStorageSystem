@@ -1,4 +1,5 @@
 ﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication;
 using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Domain.Entities;
 using GlobalFileStorageSystem.Domain.Enums;

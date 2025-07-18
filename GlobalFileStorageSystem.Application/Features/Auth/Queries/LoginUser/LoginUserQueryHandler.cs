@@ -1,9 +1,9 @@
-﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure;
+﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication;
 using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Repositories;
 using GlobalFileStorageSystem.Application.Exceptions;
 using MediatR;
 
-namespace GlobalFileStorageSystem.Application.Features.Auth.Queries
+namespace GlobalFileStorageSystem.Application.Features.Auth.Queries.LoginUser
 {
     public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, string>
     {

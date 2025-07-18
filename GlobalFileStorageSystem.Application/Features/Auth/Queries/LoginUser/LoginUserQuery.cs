@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace GlobalFileStorageSystem.Application.Features.Auth.Queries
+namespace GlobalFileStorageSystem.Application.Features.Auth.Queries.LoginUser
 {
     public class LoginUserQuery : IRequest<string>
     {

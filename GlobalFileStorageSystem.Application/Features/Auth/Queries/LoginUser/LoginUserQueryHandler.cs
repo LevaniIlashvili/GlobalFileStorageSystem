@@ -5,7 +5,7 @@ using MediatR;
 
 namespace GlobalFileStorageSystem.Application.Features.Auth.Queries.LoginUser
 {
-    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, string>
+    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, LoginResponse>
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
@@ -21,7 +21,7 @@ namespace GlobalFileStorageSystem.Application.Features.Auth.Queries.LoginUser
             _jwtService = jwtService;
         }
 
-        public async Task<string> Handle(LoginUserQuery query, CancellationToken cancellationToken)
+        public async Task<LoginResponse> Handle(LoginUserQuery query, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(query.Email, cancellationToken);
             
@@ -30,7 +30,14 @@ namespace GlobalFileStorageSystem.Application.Features.Auth.Queries.LoginUser
                 throw new UnauthorizedException("Invalid login credentials");
             }
 
-            return _jwtService.GenerateAccessToken(user);
+            var accessToken = _jwtService.GenerateAccessToken(user);
+            var refreshToken = await _jwtService.GenerateAndStoreRefreshTokenAsync(user.Id);
+
+            return new LoginResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
         }
     }
 }

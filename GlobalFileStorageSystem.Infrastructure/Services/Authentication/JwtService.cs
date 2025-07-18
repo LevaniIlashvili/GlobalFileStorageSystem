@@ -5,17 +5,20 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace GlobalFileStorageSystem.Infrastructure.Services
+namespace GlobalFileStorageSystem.Infrastructure.Services.Authentication
 {
     public class JwtService : IJwtService
     {
         private readonly JwtSettings _jwtSettings;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public JwtService(IOptions<JwtSettings> jwtSettings)
+        public JwtService(IOptions<JwtSettings> jwtSettings, IRefreshTokenService refreshTokenService)
         {
             _jwtSettings = jwtSettings.Value;
+            _refreshTokenService = refreshTokenService;
         }
 
         public string GenerateAccessToken(User user)
@@ -39,6 +42,35 @@ namespace GlobalFileStorageSystem.Infrastructure.Services
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<string> GenerateAndStoreRefreshTokenAsync(Guid userId)
+        {
+            var refreshToken = GenerateSecureRefreshToken();
+            var expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays);
+
+            await _refreshTokenService.StoreRefreshTokenAsync(userId, refreshToken, expires);
+
+            return refreshToken;
+        }
+
+        private static string GenerateSecureRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        public async Task<bool> ValidateRefreshTokenAsync(Guid userId, string refreshToken)
+        {
+            var storedToken = await _refreshTokenService.GetRefreshTokenAsync(userId);
+            return storedToken == refreshToken;
+        }
+
+        public async Task RevokeRefreshTokenAsync(Guid userId)
+        {
+            await _refreshTokenService.DeleteRefreshTokenAsync(userId);
         }
     }
 }

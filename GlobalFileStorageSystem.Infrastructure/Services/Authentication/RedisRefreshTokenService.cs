@@ -1,5 +1,6 @@
 ﻿using GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentication;
 using Microsoft.EntityFrameworkCore.Storage;
+using Minio.DataModel;
 using StackExchange.Redis;
 
 namespace GlobalFileStorageSystem.Infrastructure.Services.Authentication
@@ -16,21 +17,23 @@ namespace GlobalFileStorageSystem.Infrastructure.Services.Authentication
 
         public async Task StoreRefreshTokenAsync(Guid userId, string refreshToken, DateTime expires)
         {
-            var key = RefreshTokenPrefix + userId;
+            var key = RefreshTokenPrefix + refreshToken;
             var expiry = expires - DateTime.UtcNow;
 
-            await _database.StringSetAsync(key, refreshToken, expiry);
+            await _database.StringSetAsync(key, userId.ToString(), expiry);
         }
 
-        public async Task<string?> GetRefreshTokenAsync(Guid userId)
+        public async Task<Guid?> GetUserIdByRefreshTokenAsync(string refreshToken)
         {
-            var key = RefreshTokenPrefix + userId;
-            return await _database.StringGetAsync(key);
+            var key = RefreshTokenPrefix + refreshToken;
+            var value = await _database.StringGetAsync(key);
+
+            return value.HasValue && Guid.TryParse(value, out var userId) ? userId : null;
         }
 
-        public async Task DeleteRefreshTokenAsync(Guid userId)
+        public async Task DeleteRefreshTokenAsync(string refreshToken)
         {
-            var key = RefreshTokenPrefix + userId;
+            var key = RefreshTokenPrefix + refreshToken;
             await _database.KeyDeleteAsync(key);
         }
     }

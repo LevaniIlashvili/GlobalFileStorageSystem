@@ -6,7 +6,7 @@ namespace GlobalFileStorageSystem.Application.Contracts.Infrastructure.Authentic
     {
         string GenerateAccessToken(User user);
         Task<string> GenerateAndStoreRefreshTokenAsync(Guid userId);
-        Task<bool> ValidateRefreshTokenAsync(Guid userId, string refreshToken);
-        Task RevokeRefreshTokenAsync(Guid userId);
+        Task<Guid?> GetUserIdByRefreshTokenAsync(string refreshToken);
+        Task RevokeRefreshTokenAsync(string refreshToken);
     }
 }

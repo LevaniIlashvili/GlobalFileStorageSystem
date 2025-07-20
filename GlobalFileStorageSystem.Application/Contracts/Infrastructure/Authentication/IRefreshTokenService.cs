@@ -3,7 +3,7 @@
     public interface IRefreshTokenService
     {
         Task StoreRefreshTokenAsync(Guid userId, string refreshToken, DateTime expires);
-        Task<string?> GetRefreshTokenAsync(Guid userId);
-        Task DeleteRefreshTokenAsync(Guid userId);
+        Task<Guid?> GetUserIdByRefreshTokenAsync(string refreshToken);
+        Task DeleteRefreshTokenAsync(string refreshToken);
     }
 }

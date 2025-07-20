@@ -63,16 +63,14 @@ namespace GlobalFileStorageSystem.Infrastructure.Services.Authentication
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-
-        public async Task<bool> ValidateRefreshTokenAsync(Guid userId, string refreshToken)
+        public async Task<Guid?> GetUserIdByRefreshTokenAsync(string refreshToken)
         {
-            var storedToken = await _refreshTokenService.GetRefreshTokenAsync(userId);
-            return storedToken == refreshToken;
+            return await _refreshTokenService.GetUserIdByRefreshTokenAsync(refreshToken);
         }
 
-        public async Task RevokeRefreshTokenAsync(Guid userId)
+        public async Task RevokeRefreshTokenAsync(string refreshToken)
         {
-            await _refreshTokenService.DeleteRefreshTokenAsync(userId);
+            await _refreshTokenService.DeleteRefreshTokenAsync(refreshToken);
         }
     }
 }

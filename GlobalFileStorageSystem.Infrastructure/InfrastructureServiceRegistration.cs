@@ -70,6 +70,7 @@ namespace GlobalFileStorageSystem.Infrastructure
             services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUsageRecordRepository, UsageRecordRepository>();
 
             services.AddScoped<ILoggedInUserService, LoggedInUserService>();
 

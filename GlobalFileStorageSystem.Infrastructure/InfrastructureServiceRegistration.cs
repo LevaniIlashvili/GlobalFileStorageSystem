@@ -58,6 +58,7 @@ namespace GlobalFileStorageSystem.Infrastructure
             services.AddScoped<IRefreshTokenService, RedisRefreshTokenService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 

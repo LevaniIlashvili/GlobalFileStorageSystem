@@ -20,15 +20,15 @@ namespace GlobalFileStorageSystem.Application.Features.Auth.Queries.RefreshToken
 
         public async Task<RefreshTokenResponse> Handle(RefreshTokenQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
-            if (user == null)
-                throw new UnauthorizedException("Invalid user");
-
-            var valid = await _jwtService.ValidateRefreshTokenAsync(user.Id, request.RefreshToken);
-            if (!valid)
+            var userId = await _jwtService.GetUserIdByRefreshTokenAsync(request.RefreshToken);
+            if (userId == null)
                 throw new UnauthorizedException("Invalid refresh token");
 
-            await _jwtService.RevokeRefreshTokenAsync(user.Id);
+            var user = await _userRepository.GetByIdAsync(userId.Value, cancellationToken);
+            if (user == null)
+                throw new UnauthorizedException("User not found");
+
+            await _jwtService.RevokeRefreshTokenAsync(request.RefreshToken);
 
             var newAccessToken = _jwtService.GenerateAccessToken(user);
             var newRefreshToken = await _jwtService.GenerateAndStoreRefreshTokenAsync(user.Id);

@@ -23,7 +23,16 @@ namespace GlobalFileStorageSystem.Infrastructure
             IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("PostgreSqlConnection")));
+            {
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+                    configuration.GetConnectionString("PostgreSqlConnection"));
+
+                dataSourceBuilder.EnableDynamicJson();
+
+                var dataSource = dataSourceBuilder.Build();
+
+                options.UseNpgsql(dataSource);
+            });
 
             services.Configure<MinioOptions>(configuration.GetSection("Minio"));
 

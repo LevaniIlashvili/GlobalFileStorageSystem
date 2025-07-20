@@ -11,6 +11,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
     {
         private readonly ITenantRepository _tenantRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IAsyncRepository<UsageRecord> _usageRepository;
         private readonly IMinioService _minioService;
         private readonly IEmailService _emailService;
         private readonly IPasswordGenerator _passwordGenerator;
@@ -20,6 +21,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
         public CreateTenantCommandHandler(
             ITenantRepository tenantRepository,
             IUserRepository userRepository,
+            IAsyncRepository<UsageRecord> usageRepository,
             IMinioService minioService,
             IEmailService emailService,
             IPasswordGenerator passwordGenerator,
@@ -28,6 +30,7 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
         {
             _tenantRepository = tenantRepository;
             _userRepository = userRepository;
+            _usageRepository = usageRepository;
             _minioService = minioService;
             _emailService = emailService;
             _passwordGenerator = passwordGenerator;
@@ -95,6 +98,21 @@ namespace GlobalFileStorageSystem.Application.Features.Tenants.Commands.CreateTe
             };
 
             await _userRepository.AddAsync(user);
+
+            var usageRecord = new UsageRecord()
+            {
+                TenantId = tenant.Id,
+                ActiveUserCount = 0,
+                APICallsCount = 0,
+                BandwidthUsed = 0,
+                StorageUsed = 0,
+                FileOperationCount = 0,
+                StorageTransactions = 0,
+                SnapshotDate = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _usageRepository.AddAsync(usageRecord);
 
             await _unitOfWork.SaveChangesAsync();
 

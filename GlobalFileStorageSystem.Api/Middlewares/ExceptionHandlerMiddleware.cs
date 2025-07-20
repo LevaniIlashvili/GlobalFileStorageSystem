@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using GlobalFileStorageSystem.Application.Exceptions;
-using Minio.Exceptions;
 using System.Net;
 using System.Text.Json;
+using ForbiddenException = GlobalFileStorageSystem.Application.Exceptions.ForbiddenException;
 
 namespace GlobalFileStorageSystem.Api.Middlewares
 {
@@ -64,6 +64,10 @@ namespace GlobalFileStorageSystem.Api.Middlewares
 
                 case UnauthorizedException:
                     httpStatusCode = HttpStatusCode.Unauthorized;
+                    break;
+
+                case ForbiddenException:
+                    httpStatusCode = HttpStatusCode.Forbidden;
                     break;
 
                 default:

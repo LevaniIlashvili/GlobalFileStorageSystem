@@ -27,9 +27,23 @@ namespace GlobalFileStorageSystem.Infrastructure.Services
             {
                 await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
                 _logger.LogInformation("Bucket '{Bucket}' created for tenant '{TenantId}'", bucketName, tenantId);
-
-                // Optional: attach tenant-specific policy here if needed.
             }
+        }
+
+        public async Task<string> GeneratePreSignedUploadUrlAsync(
+            string tenantId, 
+            string objectName, 
+            string contentType, 
+            TimeSpan expiration)
+        {
+            var bucketName = GetBucketName(tenantId);
+
+            var args = new PresignedPutObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName)
+                .WithExpiry((int)expiration.TotalSeconds);
+
+            return await _minioClient.PresignedPutObjectAsync(args);
         }
 
         public async Task UploadObjectAsync(string tenantId, string objectName, Stream data, string contentType)

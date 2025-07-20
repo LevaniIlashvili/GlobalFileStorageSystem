@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Minio;
+using Npgsql;
 using StackExchange.Redis;
 
 namespace GlobalFileStorageSystem.Infrastructure
@@ -59,6 +60,8 @@ namespace GlobalFileStorageSystem.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<ILoggedInUserService, LoggedInUserService>();
 
             return services;
         }
